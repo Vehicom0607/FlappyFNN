@@ -15,7 +15,7 @@ def train():
     game_count = 0
     epsilion = 0.1
     while True:
-        for i in range(9):
+        for i in range(10):
             game.play_step(0)
         # Get Old state
         state_old = game.get_state()
@@ -35,7 +35,7 @@ def train():
             game.reset()
             game_count += 1
             print(epsilion)
-            epsilion = epsilion * 0.99
+            epsilion = epsilion * 0.9
             if score > reward:  # new High score
                 record = score
             print('Game:', game_count, 'Score:', score, 'Record:', record)

@@ -47,6 +47,7 @@ class FlappyBird:
         self.delta_y = 0
         self.score = 0
         self.framecount = 0
+        self.scuff = 0 # super scuffed
 
         self.pipe_list = []
 
@@ -57,6 +58,8 @@ class FlappyBird:
         self.pipe_list = []
         self.framecount = 0
         self.score = 0
+        self.pipe_list.extend(self.spawn_pipe())
+
 
     def spawn_pipe(self):
         random_pipe_pos = random.choice(pipe_heights)
@@ -147,9 +150,11 @@ class FlappyBird:
         game_over = self.check_game_over(self.pipe_list)
         if game_over:
             death_sound.play()
-        if (self.framecount - PIPE_COOLDOWN - (self.width / 2 - OFFSET) // PIPE_SPEED) % PIPE_COOLDOWN == 0 and \
-                (self.framecount - PIPE_COOLDOWN - (self.width / 2 - OFFSET) // PIPE_SPEED) > 0:
-            self.score += 1
+        if (self.framecount - (self.width / 2 - OFFSET) // PIPE_SPEED) % PIPE_COOLDOWN == 0:
+            if self.scuff < 2:
+                self.scuff += 1
+            else:
+                self.score += 1
             score_sound.play()
         self.display_score()
 
@@ -174,7 +179,7 @@ class FlappyBird:
             top = self.height / 2
         state = [
             self.delta_y,
-            self.height,
+            self.bird_rect.centery,
             centerx,
             top
         ]

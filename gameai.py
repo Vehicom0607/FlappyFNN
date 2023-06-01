@@ -23,7 +23,7 @@ bird_frames.append(pygame.transform.scale2x(pygame.image.load('sprites/yellowbir
 pipe_surface = pygame.image.load('sprites/pipe-green.png')
 pipe_surface = pygame.transform.scale2x(pipe_surface)
 
-pipe_heights = [400, 600, 800]
+pipe_heights = [600]
 PIPE_COOLDOWN = 72
 ANIMATION_MORE_LIKE_ANIMESH_COOLDOWN = 12
 
@@ -48,6 +48,7 @@ class FlappyBird:
         self.delta_y = 0
         self.score = 0
         self.framecount = 0
+        self.scuff = 0
 
         self.pipe_list = []
 
@@ -58,6 +59,8 @@ class FlappyBird:
         self.pipe_list = []
         self.framecount = 0
         self.score = 0
+        self.pipe_list.extend(self.spawn_pipe())
+        self.scuff = 0
 
     def spawn_pipe(self):
         random_pipe_pos = random.choice(pipe_heights)
@@ -111,6 +114,7 @@ class FlappyBird:
         self.delta_y = -JUMP_HEIGHT
 
     def play_step(self, action):
+        self.framecount += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -149,13 +153,15 @@ class FlappyBird:
         if game_over:
             death_sound.play()
             reward = -10
-        if (self.framecount - PIPE_COOLDOWN - (self.width / 2 - OFFSET) // PIPE_SPEED) % PIPE_COOLDOWN == 0 and \
-                (self.framecount - PIPE_COOLDOWN - (self.width / 2 - OFFSET) // PIPE_SPEED) > 0:
-            self.score += 1
+        if (self.framecount - (self.width / 2 - OFFSET) // PIPE_SPEED) % PIPE_COOLDOWN == 0:
+            print(self.scuff, self.score)
+            if self.scuff < 1:
+                self.scuff += 1
+            else:
+                self.score += 1
             reward = 10
             score_sound.play()
         self.display_score()
-        self.framecount += 1
 
         pygame.display.update()
 
@@ -177,7 +183,7 @@ class FlappyBird:
             top = self.height / 2
         state = [
             self.delta_y,
-            self.height,
+            self.bird_rect.centery,
             centerx,
             top
         ]
