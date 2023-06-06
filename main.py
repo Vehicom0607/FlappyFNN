@@ -11,33 +11,29 @@ def train():
     plot_mean_scores = []
     total_score = 0
     record = 0
-    agent = Agent(4, 2)
+    agent = Agent(1, 2)
     game = FlappyBird()
     game_count = 0
-    epsilion = 0.1
+    epsilon = 0.1
+
     while True:
         for i in range(10):
             game.play_step(0)
-        # Get Old state
-        state_old = game.get_state()
 
-        # get move
+        state_old = game.get_state()
         final_move = agent.act(state_old, eps=1)
 
-        # perform move and get new state
         reward, done, score = game.play_step(final_move)
         state_new = game.get_state()
 
-        # train short memory
         agent.step(state_old, final_move, reward, state_new, done)
 
         if done:
-            # Train long memory,plot result
             game.reset()
             game_count += 1
-            print(epsilion)
-            epsilion = epsilion * 0.9
-            if score > reward:  # new High score
+            print(epsilon)
+            epsilon = epsilon * 0.9
+            if score > record:
                 record = score
             print('Game:', game_count, 'Score:', score, 'Record:', record)
 
@@ -46,6 +42,9 @@ def train():
             mean_score = total_score / game_count
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
+
+            # Update the agent using A2C
+            agent.update()
 
 
 train()
