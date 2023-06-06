@@ -5,6 +5,7 @@ from gameai import FlappyBird
 from agent import Agent
 from plot import plot
 
+
 def train():
     plot_scores = []
     plot_mean_scores = []
@@ -45,5 +46,6 @@ def train():
             mean_score = total_score / game_count
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
+
 
 train()

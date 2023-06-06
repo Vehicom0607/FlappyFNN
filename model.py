@@ -1,17 +1,23 @@
 import torch
 import torch.nn as nn
 
-class Network(nn.Module):
-    def __init__(self, input_size, output_size, hidden_size=128):
-        super().__init__()
-        self.layer1 = nn.Linear(input_size, hidden_size)
-        self.layer2 = nn.Linear(hidden_size, output_size)
+class ActorCritic(nn.Module):
+    def __init__(self, num_inputs, num_actions, hidden_size, learning_rate=0.001):
+        super(ActorCritic, self).__init__()
 
-    def forward(self, x):
-        x = self.layer1(x)
-        x = nn.functional.relu(x)
-        x = self.layer2(x)
-        return x
+        self.num_actions = num_actions
+        self.critic_linear1 = nn.Linear(num_inputs, hidden_size)
+        self.critic_linear2 = nn.Linear(hidden_size, 1)
 
-    def save(self, gen):
-        torch.save(self.state_dict(), "./models/gen" + str(gen) + ".pt")
+        self.actor_linear1 = nn.Linear(num_inputs, hidden_size)
+        self.actor_linear2 = nn.Linear(hidden_size, num_actions)
+
+    def forward(self, state):
+        state = Variable(torch.from_numpy(state).float().unsqueeze(0))
+        value = F.relu(self.critic_linear1(state))
+        value = self.critic_linear2(value)
+
+        policy_dist = nn.functional.relu(self.actor_linear1(state))
+        policy_dist = nn.functional.softmax(self.actor_linear2(policy_dist), dim=0)
+
+        return value, policy_dist
